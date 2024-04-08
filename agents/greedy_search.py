@@ -1,7 +1,7 @@
-import sys
+# import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.getcwd(), "..")))
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
+# sys.path.append(os.path.abspath(os.path.join(os.getcwd(), "..")))
+# os.chdir(os.path.dirname(os.path.abspath(__file__)))
 import json
 from tools.flights.apis import Flights
 from tools.accommodations.apis import Accommodations
@@ -37,7 +37,7 @@ def get_city_list(days, deparure_city, destination):
     if days == 3:
         city_list.append(destination)
     else:
-        city_set = open('../database/background/citySet_with_states.txt').read().split('\n')
+        city_set = open('database/background/citySet_with_states.txt').read().split('\n')
         state_city_map = {}
         for unit in city_set:
             city, state = unit.split('\t')

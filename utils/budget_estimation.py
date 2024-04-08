@@ -52,7 +52,7 @@ def budget_calc(org, dest, days, date:list , people_number=None, local_constrain
 
 
     elif grain == "state":
-        city_set = open('../database/background/citySet_with_states.txt').read().strip().split('\n')
+        city_set = open('database/background/citySet_with_states.txt').read().strip().split('\n')
         
         all_hotel_data = []
         all_restaurant_data = []

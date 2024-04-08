@@ -1,38 +1,39 @@
 import re, string, os, sys
-sys.path.append(os.path.abspath(os.path.join(os.getcwd(), "..")))
-sys.path.append(os.path.abspath(os.path.join(os.getcwd(), "tools/planner")))
-sys.path.append(os.path.abspath(os.path.join(os.getcwd(), "../tools/planner")))
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
+# sys.path.append(os.path.abspath(os.path.join(os.getcwd(), "..")))
+# sys.path.append(os.path.abspath(os.path.join(os.getcwd(), "tools/planner")))
+# sys.path.append(os.path.abspath(os.path.join(os.getcwd(), "../tools/planner")))
+# os.chdir(os.path.dirname(os.path.abspath(__file__)))
 import importlib
 from typing import List, Dict, Any
 import tiktoken
 from pandas import DataFrame
-from langchain.chat_models import ChatOpenAI
-from langchain.callbacks import get_openai_callback
-from langchain.llms.base import BaseLLM
-from langchain.prompts import PromptTemplate
+from langchain_community.chat_models import ChatOpenAI
+from langchain_community.callbacks import get_openai_callback
+# from langchain.llms.base import BaseLLM
+# from langchain.prompts import PromptTemplate
 from langchain.schema import (
     AIMessage,
     HumanMessage,
     SystemMessage
 )
 from prompts import zeroshot_react_agent_prompt
-from utils.func import load_line_json_data, save_file
+# from utils.func import load_line_json_data, save_file
 import sys
 import json
 import openai
 import time
 import pandas as pd
-from datetime import datetime
+# from datetime import datetime
 from tqdm import tqdm
 from langchain_google_genai import ChatGoogleGenerativeAI
 import argparse
 from datasets import load_dataset
-import os
 
-OPENAI_API_KEY = os.environ['OPENAI_API_KEY']
-GOOGLE_API_KEY = os.environ['GOOGLE_API_KEY']
+OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY',None)
+GOOGLE_API_KEY = os.environ.get('GOOGLE_API_KEY',None)
 
+os.environ["https_proxy"] = "http://127.0.0.1:7893"
+os.environ["http_proxy"] = "http://127.0.0.1:7893"
 
 pd.options.display.max_info_columns = 200
 
@@ -71,7 +72,7 @@ class ReactAgent:
                  react_llm_name = 'gpt-3.5-turbo-1106',
                  planner_llm_name = 'gpt-3.5-turbo-1106',
                 #  logs_path = '../logs/',
-                 city_file_path = '../database/background/citySet.txt'
+                 city_file_path = 'database/background/citySet.txt'
                  ) -> None: 
 
         self.answer = ''
@@ -257,6 +258,7 @@ class ReactAgent:
                         self.finished = True
                         return
 
+            # 1.
             if action_type == 'FlightSearch':
                 try:
                     if validate_date_format(action_arg.split(', ')[2]) and validate_city_format(action_arg.split(', ')[0],self.city_set ) and validate_city_format(action_arg.split(', ')[1],self.city_set):
@@ -286,6 +288,7 @@ class ReactAgent:
                     self.scratchpad += f'Illegal Flight Search. Please try again.'
                     self.json_log[-1]['state'] = f'Illegal args. Other Error'
 
+            # 2.
             elif action_type == 'AttractionSearch':
 
                 try:
@@ -308,6 +311,7 @@ class ReactAgent:
                     self.scratchpad += f'Illegal Attraction Search. Please try again.'
                     self.json_log[-1]['state'] = f'Illegal args. Other Error'
 
+            # 3.
             elif action_type == 'AccommodationSearch':
 
                 try:
@@ -330,6 +334,7 @@ class ReactAgent:
                     self.scratchpad += f'Illegal Accommodation Search. Please try again.'
                     self.json_log[-1]['state'] = f'Illegal args. Other Error'
 
+            # 4.
             elif action_type == 'RestaurantSearch':
 
                 try:
@@ -353,7 +358,8 @@ class ReactAgent:
                     self.current_observation = f'Illegal Restaurant Search. Please try again.'
                     self.scratchpad += f'Illegal Restaurant Search. Please try again.'
                     self.json_log = f'Illegal args. Other Error'
-                    
+            
+            # 5.
             elif action_type == "CitySearch":
                 try:
                     self.scratchpad = self.scratchpad.replace(to_string(self.current_data).strip(),'Masked due to limited length. Make sure the data has been written in Notebook.')
@@ -376,7 +382,7 @@ class ReactAgent:
                     self.scratchpad += f'Illegal City Search. Please try again.'
                     self.json_log = f'Illegal args. Other Error'
 
-
+            # 6.
             elif action_type == 'GoogleDistanceMatrix':
 
                 try:
@@ -394,7 +400,7 @@ class ReactAgent:
                     self.scratchpad += f'Illegal GoogleDistanceMatrix. Please try again.'
                     self.json_log[-1]['state'] = f'Illegal args. Other Error'
             
-            
+            # 7.
             elif action_type == 'NotebookWrite':
                 try:
                     self.scratchpad = self.scratchpad.replace(to_string(self.current_data).strip(),'Masked due to limited length. Make sure the data has been written in Notebook.')
@@ -410,15 +416,15 @@ class ReactAgent:
                     self.scratchpad += f'{e}'
                     self.json_log[-1]['state'] = f'Illegal args. Other Error'
             
-
+            # 8.
             elif action_type == "Planner":
                 # try:
 
-                    self.current_observation = str(self.tools['planner'].run(str(self.tools['notebook'].list_all()),action_arg))
-                    self.scratchpad  +=  self.current_observation
-                    self.answer = self.current_observation
-                    self.__reset_record()
-                    self.json_log[-1]['state'] = f'Successful'
+                self.current_observation = str(self.tools['planner'].run(str(self.tools['notebook'].list_all()),action_arg))
+                self.scratchpad  +=  self.current_observation
+                self.answer = self.current_observation
+                self.__reset_record()
+                self.json_log[-1]['state'] = f'Successful'
 
             else:
                 self.retry_record['invalidAction'] += 1
@@ -438,8 +444,6 @@ class ReactAgent:
 
         self.step_n += 1
 
-        # 
-
         if action_type and action_type == 'Planner' and self.retry_record['planner']==0:
             
             self.finished = True
@@ -454,7 +458,9 @@ class ReactAgent:
                 if self.react_name == 'gemini':
                     request = format_step(self.llm.invoke(self._build_agent_prompt(),stop=['\n']).content)
                 else:
-                    request = format_step(self.llm([HumanMessage(content=self._build_agent_prompt())]).content)
+                    message = [HumanMessage(content=self._build_agent_prompt())]
+                    content = self.llm(message).content
+                    request = format_step(content)
                 # print(request)
                 return request
             except:
@@ -532,7 +538,6 @@ def parse_action(string):
 
 def format_step(step: str) -> str:
     return step.strip('\n').strip().replace('\n', '')
-
 
 
 def truncate_scratchpad(scratchpad: str, n_tokens: int = 1600, tokenizer=gpt2_enc) -> str:
@@ -646,7 +651,7 @@ if __name__ == '__main__':
     agent = ReactAgent(None, tools=tools_list,max_steps=30,react_llm_name=args.model_name,planner_llm_name=args.model_name)
     with get_openai_callback() as cb:
         
-        for number in tqdm(numbers[:]):
+        for number in tqdm(numbers[:1]):
             query = query_data_list[number-1]['query']
               # check if the directory exists
             if not os.path.exists(os.path.join(f'{args.output_dir}/{args.set_type}')):

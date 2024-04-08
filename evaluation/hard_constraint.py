@@ -1,4 +1,4 @@
-from utils.func import get_valid_name_city,extract_before_parenthesis,extract_numbers_from_filenames
+from utils.func import get_valid_name_city
 from tools.flights.apis import Flights
 from tools.accommodations.apis import Accommodations
 from tools.restaurants.apis import Restaurants
@@ -8,13 +8,13 @@ import math
 import json
 import re
 import numpy as np
-import os
-import sys
-from tqdm import tqdm
-import argparse
+# import os
+# import sys
+# from tqdm import tqdm
+# import argparse
 
-sys.path.append(os.path.abspath(os.path.join(os.getcwd(), "..")))
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
+# sys.path.append(os.path.abspath(os.path.join(os.getcwd(), "..")))
+# os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
 flight = Flights()

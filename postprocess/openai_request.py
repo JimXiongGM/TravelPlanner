@@ -13,9 +13,7 @@ from datasets import load_dataset
 
 T = TypeVar('T')
 KEY_INDEX = 0
-KEY_POOL =  [
-   os.environ['OPENAI_API_KEY']
-]# your key pool
+KEY_POOL =  [os.environ.get('OPENAI_API_KEY',None)]
 openai.api_key = KEY_POOL[0]
 
 

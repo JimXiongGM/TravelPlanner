@@ -1,16 +1,16 @@
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.getcwd(), "..")))
+# sys.path.append(os.path.abspath(os.path.join(os.getcwd(), "..")))
 from langchain.prompts import PromptTemplate
-from agents.prompts import planner_agent_prompt, cot_planner_agent_prompt, react_planner_agent_prompt,reflect_prompt,react_reflect_planner_agent_prompt, REFLECTION_HEADER
+from agents.prompts import planner_agent_prompt, react_planner_agent_prompt,reflect_prompt,react_reflect_planner_agent_prompt, REFLECTION_HEADER
 from langchain.chat_models import ChatOpenAI
-from langchain.llms.base import BaseLLM
+# from langchain.llms.base import BaseLLM
 from langchain.schema import (
     AIMessage,
     HumanMessage,
     SystemMessage
 )
-from env import ReactEnv,ReactReflectEnv
+from .env import ReactEnv,ReactReflectEnv
 import tiktoken
 import re
 import openai
@@ -18,11 +18,11 @@ import time
 from enum import Enum
 from typing import List, Union, Literal
 from langchain_google_genai import ChatGoogleGenerativeAI
-import argparse
+# import argparse
 
 
-OPENAI_API_KEY = os.environ['OPENAI_API_KEY']
-GOOGLE_API_KEY = os.environ['GOOGLE_API_KEY']
+OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY',None)
+GOOGLE_API_KEY = os.environ.get('GOOGLE_API_KEY',None)
 
 
 def catch_openai_api_error():
